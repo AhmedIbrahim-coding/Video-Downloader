@@ -2,6 +2,7 @@ import yt_dlp
 import requests
 import io
 from PIL import Image
+import os
 
 class video:
     def __init__(self,url):
@@ -20,3 +21,12 @@ class video:
             imageFile = io.BytesIO(imageData) # store it in the memory
             pil_image = Image.open(imageFile) # convert it into a pillow image
             self.image = pil_image # store it in a variable
+
+    def Download(self):
+        '''downDir = "MyVideoDownloads"
+        downloadPath = os.path.join(downDir, f"{self.title}.mp4")
+
+        downOptions = {'outtmp': downloadPath}
+        with yt_dlp.YoutubeDL(downOptions) as downloader:
+            downloader.download([self.url])'''
+        pass

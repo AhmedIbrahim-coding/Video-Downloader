@@ -19,20 +19,31 @@ def downOptions(link):
     downWindow.title("Download Options")
     downWindow.grab_set()
     downWindow.transient(root)
-    
+    downWindow.resizable(False, False) # disable changing the size of the window by the user
+
+    # a frame that containes the video image & title
+    topFrame = ctk.CTkFrame(downWindow, width=700, height=220, fg_color="#141414")
+    topFrame.pack(padx=10,pady=10)
+
+
+    # display start downloading button
+    startDown = ctk.CTkButton(downWindow, text="Start", height=30, width=80, font=("arial", 15), command=newVideo.Download)
+    startDown.place(x=600, y=300)
+
     # display the video's title
     titleText = newVideo.title
     if len(titleText) > 32:
         titleText = titleText[0:33] + "....."
     
-    textLabel = ctk.CTkLabel(downWindow, text=titleText, font=("Arial", 20))
-    textLabel.place(x= 370, y= 20)
 
     
+    textLabel = ctk.CTkLabel(topFrame, text=titleText, font=("Arial", 20))
+    textLabel.place(x= 340, y= 20)
+ 
     # display the video's thumbnail
     pil_image = ctk.CTkImage(light_image=newVideo.image, dark_image=newVideo.image, size=(320, 180))
-    image_label = ctk.CTkLabel(downWindow, image=pil_image, text="")
-    image_label.place(x=30, y=20)
+    image_label = ctk.CTkLabel(topFrame, image=pil_image, text="")
+    image_label.place(x=10, y=20)
 
 
 
