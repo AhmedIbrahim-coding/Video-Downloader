@@ -26,41 +26,7 @@ def downOptions(link):
     topFrame = ctk.CTkFrame(downWindow, width=700, height=220, fg_color="#141414")
     topFrame.pack(padx=10,pady=10)
     
-    #    We'll use the Downloads folder as the default.
-    downWindow.chosen_directory = Path.home() / "Downloads"
-
-    # 2. Create a frame to hold the directory widgets
-    dir_frame = ctk.CTkFrame(downWindow, width=700, height=40)
-    dir_frame.pack(padx=10, pady=0) # Pack it right below the topFrame
-
-    # 3. Create a label to show the currently selected path
-    dir_label_text = f"Save to: {downWindow.chosen_directory}"
-    dir_label = ctk.CTkLabel(dir_frame, text=dir_label_text, font=("Arial", 12))
-    dir_label.place(x=10, y=8) # Positioned inside the new frame
-
-    # 4. Define the function that the "Select Folder" button will call
-    def select_directory_command():
-        """Opens the dialog and updates the path"""
-        chosen_path = filedialog.askdirectory(initialdir=downWindow.chosen_directory)
-        
-        if chosen_path: # Only update if the user didn't cancel
-            # Update the variable stored in the window
-            downWindow.chosen_directory = Path(chosen_path)
-            
-            # Update the label's text
-            new_text = f"Save to: {downWindow.chosen_directory}"
-            dir_label.configure(text=new_text)
-
-    # 5. Create the "Select Folder" button
-    select_button = ctk.CTkButton(
-        dir_frame,
-        text="Select Folder",
-        width=100,
-        font=("arial", 12),
-        command=select_directory_command  # Link to our new function
-    )
-    select_button.place(x=590, y=5) # Positioned inside the new frame
-
+ 
     # We use a 'lambda' to pass the chosen directory to the Download function
     startDown = ctk.CTkButton(
         downWindow,
