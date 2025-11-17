@@ -1,89 +1,33 @@
 import customtkinter as ctk
-from videoInfo import video
-from tkinter import filedialog  # --- ADD THIS ---
-from pathlib import Path      # --- ADD THIS ---
+from pytube import YouTube
+from download_window import download_options
+
 
 # creating the main window
-root = ctk.CTk()
-root.geometry("800x240")
-root.title("DownTube")
-
-lable_statment = None
-
-def downOptions(link):
-    newVideo = video(link)
-    newVideo.getInfo()
-
-    # creating a new child window for downloading options
-    downWindow = ctk.CTkToplevel(root)
-    downWindow.geometry("720x360")
-    downWindow.title("Download Options")
-    downWindow.grab_set()
-    downWindow.transient(root)
-    downWindow.resizable(False, False)
-
-    # a frame that containes the video image & title
-    topFrame = ctk.CTkFrame(downWindow, width=700, height=220, fg_color="#141414")
-    topFrame.pack(padx=10,pady=10)
-    
- 
-    # We use a 'lambda' to pass the chosen directory to the Download function
-    startDown = ctk.CTkButton(
-        downWindow,
-        text="Start",
-        height=30,
-        width=80,
-        font=("arial", 15),
-        command=lambda: newVideo.Download(downWindow.chosen_directory)
-    )
-    startDown.place(x=600, y=300)
-
-    # display the video's title
-    titleText = newVideo.title
-    if len(titleText) > 32:
-        titleText = titleText[0:33] + "....."
-    
-    textLabel = ctk.CTkLabel(topFrame, text=titleText, font=("Arial", 20))
-    textLabel.place(x= 340, y= 20)
-
-    # display the video's thumbnail
-    pil_image = ctk.CTkImage(light_image=newVideo.image, dark_image=newVideo.image, size=(320, 180))
-    image_label = ctk.CTkLabel(topFrame, image=pil_image, text="")
-    image_label.place(x=10, y=20)
-    
-    # The old comment was here: # the directory specifing
-    # We added the code for it above.
+main_window = ctk.CTk()
+main_window.title("Youtube Downloader")
+main_window.geometry("500x200")
+main_window.resizable(False, False) # make it's not possible to resize the window
 
 
-def PrepareDownload():
-    # store the url
-    link = linkEntry.get()
+# creating an entry field to get the video link
+linkEntry = ctk.CTkEntry(main_window, placeholder_text="Enter the url....", width=450, height=30,corner_radius=3, font=("Arial", 14))
+linkEntry.pack(pady=20)
 
-    # call the statement variable as global
-    global lable_statment
-
-    # remove anything inside the statement variable
-    if lable_statment:
-        lable_statment.destroy()
-        lable_statment = None
-
-    # check the existance of the url
+# function to prepare the download
+def prepareDownload():
+    videoURL = linkEntry.get()
     try:
-        downOptions(link)
-    except Exception as e: # It's good practice to catch the specific error
-        print(f"An error occurred: {e}") # For debugging
-        # put a lable inside statement variable
-        lable_statment = ctk.CTkLabel(root, text="Not found!", font=ctk.CTkFont(size=15), text_color="red")
-        lable_statment.pack()
+        link = YouTube(videoURL) 
+        print("Found!")
+        download_options(link)
+    except Exception:
+        print("Error: Invalid URL")
 
 
-# the entry place that takes the video link
-linkEntry = ctk.CTkEntry(root, placeholder_text="Put the link here....", width=720, height=35, font=ctk.CTkFont(size=15))
-linkEntry.pack(pady=20, padx=20)
+# creating a download button
+downloadButton = ctk.CTkButton(main_window, text = "Download", width=80, height= 30, corner_radius=3, font=("Arial", 14), command=prepareDownload)
+downloadButton.pack(pady=10)
 
-# creating a button to start preparing to download the video
-downBut = ctk.CTkButton(root, text="Download", font=ctk.CTkFont(family="Arial", size=12, weight="bold"), width=80, height=30, command=PrepareDownload)
-downBut.pack(pady=30)
-
-# keep appearing the window
-root.mainloop()
+# running the main loop
+main_window.mainloop()
