@@ -16,13 +16,22 @@ linkEntry.pack(pady=20)
 
 # function to prepare the download
 def prepareDownload():
-    videoURL = linkEntry.get()
+    errorText = None # create a variable to store error massages
+
+    # ckeck if the video exists
     try:
-        link = YouTube(videoURL) 
-        print("Found!")
-        download_options(link)
+        link = YouTube(linkEntry.get()) # ask the Youtube object to verify the link
+        
+        if errorText:  # if there was an error message before, remove it
+            errorText.destroy()
+            errorText = None
+
+        download_options(link, main_window) # open the download options window
+
     except Exception:
-        print("Error: Invalid URL")
+        # if an error occurs, show an error message
+        errorText = ctk.CTkLabel(main_window, text="Invalid URL. Please try again.", font=("Arial", 12), text_color="red")
+        errorText.place(relx=0.5, y=150, anchor='center')
 
 
 # creating a download button
