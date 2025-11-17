@@ -14,18 +14,19 @@ main_window.resizable(False, False) # make it's not possible to resize the windo
 linkEntry = ctk.CTkEntry(main_window, placeholder_text="Enter the url....", width=450, height=30,corner_radius=3, font=("Arial", 14))
 linkEntry.pack(pady=20)
 
+errorText = None  # variable to store error message label
+
 # function to prepare the download
 def prepareDownload():
-    errorText = None # create a variable to store error massages
+    global errorText # make errorText accessible inside the function
+
+    if errorText:  # if there was an error message before, remove it
+        errorText.destroy()
 
     # ckeck if the video exists
     try:
         link = YouTube(linkEntry.get()) # ask the Youtube object to verify the link
-        
-        if errorText:  # if there was an error message before, remove it
-            errorText.destroy()
-            errorText = None
-
+        errorText = None # keet errorText as None if the link is valid
         download_options(link, main_window) # open the download options window
 
     except Exception:
