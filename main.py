@@ -1,43 +1,54 @@
 import customtkinter as ctk
-from pytube import YouTube
-from download_window import download_options
+from pytube import YouTube  
+
+class App(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+        self.title("DownTube")
+        self.geometry("500x200")
+        self.resizable(False, False)
+        self.video_link = None
+        
+        # Link entry
+        self.linkEntry = ctk.CTkEntry(self,
+                                       width=450,
+                                       height=30,
+                                       placeholder_text="Enter the video link here...",
+                                       corner_radius=3,
+                                       font=("Arial", 14))
+        self.linkEntry.pack(pady=20)
+
+        # start download button
+        self.download_button = ctk.CTkButton(self,
+                                             text="Download",
+                                             width=80,
+                                             height=30,
+                                             corner_radius=3,
+                                             font=("Arial", 14),
+                                             command=self.check_excistance)
+        self.download_button.pack(pady=10)
+
+    def check_excistance(self):
+        try:
+            self.video_link = YouTube(self.linkEntry.get())
+            self.download_options()
+        except Exception:
+            print("Not Found")
+    
+    def download_options(self):
+        window = self.download_window = ctk.CTkToplevel(self)
+        window.title("Download Options")
+        window.geometry("720x360")
+        window.resizable(False, False)
+        window.grab_set()  # Make this window modal
+        window.focus_set()
+
+        # write a temorary lable to show that the download is being prepared
+        label = ctk.CTkLabel(window, text="Preparing download....", font=("Arial", 32))
+        label.place(relx=0.5, rely=0.5, anchor='center')
+        
 
 
-# creating the main window
-main_window = ctk.CTk()
-main_window.title("Youtube Downloader")
-main_window.geometry("500x200")
-main_window.resizable(False, False) # make it's not possible to resize the window
-
-
-# creating an entry field to get the video link
-linkEntry = ctk.CTkEntry(main_window, placeholder_text="Enter the url....", width=450, height=30,corner_radius=3, font=("Arial", 14))
-linkEntry.pack(pady=20)
-
-errorText = None  # variable to store error message label
-
-# function to prepare the download
-def prepareDownload():
-    global errorText # make errorText accessible inside the function
-
-    if errorText:  # if there was an error message before, remove it
-        errorText.destroy()
-
-    # ckeck if the video exists
-    try:
-        link = YouTube(linkEntry.get()) # ask the Youtube object to verify the link
-        errorText = None # keet errorText as None if the link is valid
-        download_options(link, main_window) # open the download options window
-
-    except Exception:
-        # if an error occurs, show an error message
-        errorText = ctk.CTkLabel(main_window, text="Invalid URL. Please try again.", font=("Arial", 12), text_color="red")
-        errorText.place(relx=0.5, y=150, anchor='center')
-
-
-# creating a download button
-downloadButton = ctk.CTkButton(main_window, text = "Download", width=80, height= 30, corner_radius=3, font=("Arial", 14), command=prepareDownload)
-downloadButton.pack(pady=10)
-
-# running the main loop
-main_window.mainloop()
+if __name__ == "__main__":
+    app = App()
+    app.mainloop()
