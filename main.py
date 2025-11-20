@@ -1,6 +1,6 @@
 import customtkinter as ctk
-from pytube import YouTube  
 from get_info import video
+import threading
 
 class App(ctk.CTk):
     def __init__(self):
@@ -9,6 +9,7 @@ class App(ctk.CTk):
         self.geometry("500x200")
         self.resizable(False, False)
         self.video_link = None
+        self.video_info = None
         
         # Link entry
         self.linkEntry = ctk.CTkEntry(self,
@@ -37,18 +38,12 @@ class App(ctk.CTk):
         if(self.error_text):
             self.error_text.destroy()
 
-        # check if the link is valid
-        try:
-            self.video_link = YouTube(self.linkEntry.get())
-            self.error_text = None # keep the error_text as None if successful
-            self.download_options()
-        except Exception:
-            # display error message
-            self.error_text = ctk.CTkLabel(self,
-                                           text="Invalid URL. Please try again.",
-                                           text_color="red",
-                                           font=("Arial", 12))
-            self.error_text.place(relx=0.5, y=150, anchor='center')
+        # We just get the text here. The validation happens in the thread now.
+        self.video_link = self.linkEntry.get()
+        
+        # 1. Open the window immediately
+        self.download_options()
+        self.error_text = None 
     
     def download_options(self):
         window = self.download_window = ctk.CTkToplevel(self)
@@ -59,14 +54,54 @@ class App(ctk.CTk):
         window.focus_set()
 
         # write a temorary lable to show that the download is being prepared
-        label = ctk.CTkLabel(window, text="Preparing download....", font=("Arial", 32))
-        label.place(relx=0.5, rely=0.5, anchor='center')
+        self.temp_label_massage = ctk.CTkLabel(window, text="Preparing download....", font=("Arial", 32))
+        self.temp_label_massage.place(relx=0.5, rely=0.5, anchor='center')
         
-        new_video = video(self.video_link.watch_url) # crate a new video object and give it the url
+        new_video = video(self.video_link) # crate a new video object
+        
+        # 2. Start the thread (Fixed the tuple syntax here too)
+        threading.Thread(target=self.fetch_video_info, args=(new_video,)).start()
 
-        video_info = new_video.getInformations()
-        print(video_info['title'])
 
+    def fetch_video_info(self, video_obj):
+            try:
+                # 1. Get the info
+                video_info = video_obj.getInformations()
+                
+                # 2. CHECK: Is it actually a video?
+                # The homepage has a title ("YouTube") but NO duration.
+                # Valid videos always have a duration (unless it is a livestream).
+                is_live = video_info.get('is_live', False)
+                duration = video_info.get('duration')
+
+                if not duration and not is_live:
+                    raise Exception("Link is a Page, not a Video")
+
+                # 3. If we passed the check, save it and update GUI
+                self.video_info = video_info
+                self.after(0, self.temp_label_massage.destroy) 
+                
+            except Exception as e:
+                # 4. Print the error to your console so you can see it
+                print(f"Validation failed: {e}")
+                
+                # 5. Trigger the error on the main screen
+                self.after(0, self.handle_error)
+
+    def handle_error(self):
+        # This function runs on the Main Thread when triggered by the background thread
+        self.main_error_massage("Invalid URL. Please try again.")
+        
+        if self.download_window:
+            self.download_window.destroy()
+
+    def main_error_massage(self, massage):
+            # display error message
+            self.error_text = ctk.CTkLabel(self,
+                                           text=massage,
+                                           text_color="red",
+                                           font=("Arial", 12))
+            self.error_text.place(relx=0.5, y=150, anchor='center')
 
 if __name__ == "__main__":
     app = App()
