@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from pytube import YouTube  
+from get_info import video
 
 class App(ctk.CTk):
     def __init__(self):
@@ -28,12 +29,26 @@ class App(ctk.CTk):
                                              command=self.check_excistance)
         self.download_button.pack(pady=10)
 
+        # create a variable to hold error text
+        self.error_text = None
+
     def check_excistance(self):
+        # remove previous error text if exists
+        if(self.error_text):
+            self.error_text.destroy()
+
+        # check if the link is valid
         try:
             self.video_link = YouTube(self.linkEntry.get())
+            self.error_text = None # keep the error_text as None if successful
             self.download_options()
         except Exception:
-            print("Not Found")
+            # display error message
+            self.error_text = ctk.CTkLabel(self,
+                                           text="Invalid URL. Please try again.",
+                                           text_color="red",
+                                           font=("Arial", 12))
+            self.error_text.place(relx=0.5, y=150, anchor='center')
     
     def download_options(self):
         window = self.download_window = ctk.CTkToplevel(self)
@@ -47,6 +62,10 @@ class App(ctk.CTk):
         label = ctk.CTkLabel(window, text="Preparing download....", font=("Arial", 32))
         label.place(relx=0.5, rely=0.5, anchor='center')
         
+        new_video = video(self.video_link.watch_url) # crate a new video object and give it the url
+
+        video_info = new_video.getInformations()
+        print(video_info['title'])
 
 
 if __name__ == "__main__":
