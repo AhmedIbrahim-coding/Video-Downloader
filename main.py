@@ -113,6 +113,23 @@ class App(ctk.CTk):
         top_frame = ctk.CTkFrame(window, width=700, height=200, fg_color="#1A1A1A", corner_radius=3)
         top_frame.pack(pady=10)
 
+        # display video thumbnail
+        video_thmb = video_obj.GetImage()
+        image = ctk.CTkImage(light_image= video_thmb,
+                             dark_image= video_thmb,
+                             size=(320, 180))
+        thumbnail_label = ctk.CTkLabel(top_frame, image=image, text="")
+        thumbnail_label.place(x=10, y=10)
+
+        # display video title
+        title = self.video_info['title']
+        if len(title) > 40:
+            title = title[:37] + " ..."
+        viedo_title = ctk.CTkLabel(top_frame,
+                                    text=title,
+                                    font=("Arial", 20)
+                                    )
+        viedo_title.place(x=350, y=20)
 
 if __name__ == "__main__":
     app = App()
