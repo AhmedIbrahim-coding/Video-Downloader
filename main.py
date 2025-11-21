@@ -132,20 +132,18 @@ class App(ctk.CTk):
         video_title.place(x=350, y=20)
 
         # display video duration
-        '''
         pil_duration_icon = Image.open("Duration_icon.png")
         duration_icon = ctk.CTkImage(light_image= pil_duration_icon,
                                      dark_image= pil_duration_icon,
-                                     size=(30, 30))
-        duration_icon_label = ctk.CTkLabel(top_frame,
-                                           image=duration_icon)
+                                     size=(20, 20))
+        duration_icon_label = ctk.CTkLabel(top_frame, image=duration_icon, text="")
         duration_icon_label.place(x=350, y=70)
-        '''
+
         video_obj.getDuration()
         duration_label = ctk.CTkLabel(top_frame,
                                       text=video_obj.duration,
                                       font=("Arial", 13))
-        duration_label.place(x=380, y=70)
+        duration_label.place(x=370, y=70)
 
 
 if __name__ == "__main__":
