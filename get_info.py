@@ -9,16 +9,18 @@ class video:
         self.info = None
         self.duration = None
         self.size = None
+        self.quality = None
     
     def getInformations(self):
         options = {
             'quiet': True,
             'no_warnings': True,
+            'skip_download': True,
+            'format': 'bestvideo+bestaudio'
         }
         with yt_dlp.YoutubeDL(options) as ydl:
             info = ydl.extract_info(self.url, download=False)
             self.info = info
-            print(self.info)
             return self.info
     
     def GetImage(self):
@@ -59,15 +61,8 @@ class video:
         # set an initial size of 0 bytes
         size_in_bytes = 0
 
-        # check if the video has multiple formats
-        if 'requested_formats' in self.info:
-            for fmt in self.info['requested_formats']:
-                # sum up the filesize of each format
-                size_in_bytes += fmt.get('filesize') or fmt.get('filesize_approx') or 0
-
-        # if size is still 0, try to get it from the main info
-        if size_in_bytes == 0:
-            size_in_bytes = self.info.get('filesize') or self.info.get('filesize_approx') or 0
+        # git the size from the info dict
+        size_in_bytes = self.info.get('filesize') or self.info.get('filesize_approx') or 0
 
 
         # convert size to MB or GB
@@ -82,3 +77,11 @@ class video:
         else:
             # if size could not be determined just set it to unknown
             self.size = " Unknown Size"
+
+    def getQuality(self):
+        height = self.info.get('height')
+        width = self.info.get('width')
+        if height and width:
+            self.quality = f"{width}x{height}"
+        else:
+            self.quality = "Unknown Quality"
