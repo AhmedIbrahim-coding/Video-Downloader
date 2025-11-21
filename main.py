@@ -2,6 +2,8 @@ import customtkinter as ctk
 from get_info import video
 import threading
 from PIL import Image
+from tkinter import filedialog
+import os
 
 class App(ctk.CTk):
     def __init__(self):
@@ -11,6 +13,7 @@ class App(ctk.CTk):
         self.resizable(False, False)
         self.video_link = None
         self.video_info = None
+        self.download_location = os.path.join(os.path.expanduser("~"), "Downloads")
         
         # Link entry
         self.linkEntry = ctk.CTkEntry(self,
@@ -124,8 +127,8 @@ class App(ctk.CTk):
 
         # display video title
         title = self.video_info['title']
-        if len(title) > 40:
-            title = title[:37] + " ..."
+        if len(title) > 33:
+            title = title[:30] + " ..."
         video_title = ctk.CTkLabel(top_frame,
                                     text=title,
                                     font=("Arial", 20))
@@ -172,6 +175,42 @@ class App(ctk.CTk):
                                      text=video_obj.quality,
                                      font=("Arial", 13))
         quality_label.place(x=375, y=130)
+
+
+        # Choose download location path and button_browse
+        location_frame = ctk.CTkFrame(window, width=400, 
+                                      height=32, 
+                                      fg_color="#1A1A1A", 
+                                      corner_radius=1)
+        location_frame.place(x=10, y=230)
+
+        # display location icon
+        pil_location_icon = Image.open("Location_icon.png")
+        location_icon = ctk.CTkImage(light_image= pil_location_icon,
+                                     dark_image= pil_location_icon,
+                                     size=(25, 25))
+        location_icon_label = ctk.CTkLabel(location_frame, image=location_icon, text="")
+        location_icon_label.place(x=5, y=1.5)
+
+        # display current download location & make it accessible for other methods
+        self.location_label = ctk.CTkLabel(location_frame, text=self.download_location, font=("Arial", 14))
+        self.location_label.place(x=32, y=2)
+
+        choose_location_button = ctk.CTkButton(window,
+                                               text="Browse",
+                                               width=80,
+                                               height=30,
+                                               corner_radius=1,
+                                               font=("Arial", 14),
+                                               command=self.choose_location)
+        choose_location_button.place(x=410, y=231)
+
+    def choose_location(self):
+        folder_selected = filedialog.askdirectory()
+        if folder_selected:
+            self.download_location = folder_selected
+            self.location_label.configure(text=self.download_location)
+
 
 if __name__ == "__main__":
     app = App()
