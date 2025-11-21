@@ -41,6 +41,10 @@ class App(ctk.CTk):
         # We just get the text here. The validation happens in the thread now.
         self.video_link = self.linkEntry.get()
         
+        # Check if the link is empty
+        if(not self.video_link):
+            self.main_error_massage("Please enter a video link.")
+            return
         # 1. Open the window immediately
         self.download_options()
         self.error_text = None 
@@ -69,8 +73,6 @@ class App(ctk.CTk):
                 video_info = video_obj.getInformations()
                 
                 # 2. CHECK: Is it actually a video?
-                # The homepage has a title ("YouTube") but NO duration.
-                # Valid videos always have a duration (unless it is a livestream).
                 is_live = video_info.get('is_live', False)
                 duration = video_info.get('duration')
 
@@ -80,12 +82,9 @@ class App(ctk.CTk):
                 # 3. If we passed the check, save it and update GUI
                 self.video_info = video_info
                 self.after(0, self.temp_label_massage.destroy) 
-                
-            except Exception as e:
-                # 4. Print the error to your console so you can see it
-                print(f"Validation failed: {e}")
-                
-                # 5. Trigger the error on the main screen
+                self.after(0, self.display_video_info, args=(video_obj,))
+            except Exception:
+                # 4. Display the error on the main screen
                 self.after(0, self.handle_error)
 
     def handle_error(self):
@@ -102,6 +101,10 @@ class App(ctk.CTk):
                                            text_color="red",
                                            font=("Arial", 12))
             self.error_text.place(relx=0.5, y=150, anchor='center')
+
+    def display_video_info(self, video_obj):
+        if self.video_info:
+            print(self.video_info)  # For demonstration purposes
 
 if __name__ == "__main__":
     app = App()
