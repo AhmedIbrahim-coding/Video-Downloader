@@ -145,6 +145,19 @@ class App(ctk.CTk):
                                       font=("Arial", 13))
         duration_label.place(x=370, y=70)
 
+        # display video file size
+        pil_size_icon = Image.open("Size_icon.png")
+        size_icon = ctk.CTkImage(light_image= pil_size_icon,
+                                 dark_image= pil_size_icon,
+                                 size=(20, 20))
+        size_icon_label = ctk.CTkLabel(top_frame, image=size_icon, text="")
+        size_icon_label.place(x=350, y=100)
+
+        video_obj.getSize()
+        size_label = ctk.CTkLabel(top_frame,
+                                  text=video_obj.size,
+                                  font=("Arial", 13))
+        size_label.place(x=370, y=100)
 
 if __name__ == "__main__":
     app = App()
