@@ -81,8 +81,7 @@ class App(ctk.CTk):
 
                 # 3. If we passed the check, save it and update GUI
                 self.video_info = video_info
-                self.after(0, self.temp_label_massage.destroy) 
-                self.after(0, self.display_video_info, args=(video_obj,))
+                self.after(0, self.display_video_info, video_obj)
             except Exception:
                 # 4. Display the error on the main screen
                 self.after(0, self.handle_error)
@@ -103,8 +102,17 @@ class App(ctk.CTk):
             self.error_text.place(relx=0.5, y=150, anchor='center')
 
     def display_video_info(self, video_obj):
-        if self.video_info:
-            print(self.video_info)  # For demonstration purposes
+        # create a local reference to the download window
+        window = self.download_window
+
+        # Clear previous widgets
+        for widget in window.winfo_children():
+            widget.destroy()
+
+        # create a frame to hold title and thumbnail
+        top_frame = ctk.CTkFrame(window, width=700, height=200, fg_color="#1A1A1A", corner_radius=3)
+        top_frame.pack(pady=10)
+
 
 if __name__ == "__main__":
     app = App()
