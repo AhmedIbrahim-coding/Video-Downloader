@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from get_info import video
 import threading
+from PIL import Image
 
 class App(ctk.CTk):
     def __init__(self):
@@ -125,11 +126,27 @@ class App(ctk.CTk):
         title = self.video_info['title']
         if len(title) > 40:
             title = title[:37] + " ..."
-        viedo_title = ctk.CTkLabel(top_frame,
+        video_title = ctk.CTkLabel(top_frame,
                                     text=title,
-                                    font=("Arial", 20)
-                                    )
-        viedo_title.place(x=350, y=20)
+                                    font=("Arial", 20))
+        video_title.place(x=350, y=20)
+
+        # display video duration
+        '''
+        pil_duration_icon = Image.open("Duration_icon.png")
+        duration_icon = ctk.CTkImage(light_image= pil_duration_icon,
+                                     dark_image= pil_duration_icon,
+                                     size=(30, 30))
+        duration_icon_label = ctk.CTkLabel(top_frame,
+                                           image=duration_icon)
+        duration_icon_label.place(x=350, y=70)
+        '''
+        video_obj.getDuration()
+        duration_label = ctk.CTkLabel(top_frame,
+                                      text=video_obj.duration,
+                                      font=("Arial", 13))
+        duration_label.place(x=380, y=70)
+
 
 if __name__ == "__main__":
     app = App()
