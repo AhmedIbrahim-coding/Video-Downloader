@@ -85,3 +85,14 @@ class video:
             self.quality = f"{width}x{height}"
         else:
             self.quality = "Unknown Quality"
+
+
+    def downloadVideo(self, download_path):
+        options = {
+            'outtmpl': f'{download_path}/%(title)s.%(ext)s',
+            'format': 'bestvideo+bestaudio',
+            'quiet': True,
+            'no_warnings': True
+        }
+        with yt_dlp.YoutubeDL(options) as ydl:
+            ydl.download([self.url])

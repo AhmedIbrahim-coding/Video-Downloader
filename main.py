@@ -205,12 +205,24 @@ class App(ctk.CTk):
                                                command=self.choose_location)
         choose_location_button.place(x=410, y=231)
 
+        # Download button
+        start_download_button = ctk.CTkButton(window,
+                                              text="Start",
+                                              width=100,
+                                              height=30,
+                                              corner_radius=3,
+                                              font=("Arial", 16),
+                                              command=lambda: self.DownloadVideo(video_obj))
+        start_download_button.place(x=600, y=310)
+
     def choose_location(self):
         folder_selected = filedialog.askdirectory()
         if folder_selected:
             self.download_location = folder_selected
             self.location_label.configure(text=self.download_location)
 
+    def DownloadVideo(self, video_obj):
+        video_obj.downloadVideo(self.download_location)
 
 if __name__ == "__main__":
     app = App()
