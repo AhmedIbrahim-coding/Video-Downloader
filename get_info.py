@@ -12,6 +12,7 @@ class video:
         self.quality = None
         self.height = None
         self.width = None
+        self.progress = 0
     
     def getInformations(self):
         options = {
@@ -93,7 +94,17 @@ class video:
             'format': 'best',
             'quiet': True,
             'no_warnings': True,
+            'progress_hooks': [self.progress_hook],
         }
 
-        with yt_dlp.YoutubeDL(options) as ydl:
-            ydl.download([self.url])
+        with yt_dlp.YoutubeDL(options) as downloader:
+            downloader.download([self.url])
+
+
+    def progress_hook(self, d):
+        if d['status'] == 'downloading':
+            downloaded = d.get('downloaded_bytes', 0)
+            total = d.get('total_bytes') or d.get('total_bytes_estimate') or 1
+            percent = downloaded / total * 100
+
+            self.progress = percent
