@@ -170,9 +170,8 @@ class App(ctk.CTk):
         display_icon_label = ctk.CTkLabel(top_frame, image=display_icon, text="")
         display_icon_label.place(x=350, y=130)
 
-        video_obj.getQuality()
         quality_label = ctk.CTkLabel(top_frame,
-                                     text=video_obj.quality,
+                                     text=f"{video_obj.width}x{video_obj.height}" if video_obj.height and video_obj.width else "Unknown Quality",
                                      font=("Arial", 13))
         quality_label.place(x=375, y=130)
 

@@ -10,6 +10,8 @@ class video:
         self.duration = None
         self.size = None
         self.quality = None
+        self.height = None
+        self.width = None
     
     def getInformations(self):
         options = {
@@ -21,7 +23,13 @@ class video:
         with yt_dlp.YoutubeDL(options) as ydl:
             info = ydl.extract_info(self.url, download=False)
             self.info = info
+            # set video as the best quality based on height and width
+            if self.info['height'] and self.info['width']:
+                self.height = self.info['height']
+                self.width = self.info['width']
             return self.info
+        
+        
     
     def GetImage(self):
         # gitting the image from the thumbnail url
@@ -78,21 +86,14 @@ class video:
             # if size could not be determined just set it to unknown
             self.size = " Unknown Size"
 
-    def getQuality(self):
-        height = self.info.get('height')
-        width = self.info.get('width')
-        if height and width:
-            self.quality = f"{width}x{height}"
-        else:
-            self.quality = "Unknown Quality"
-
-
     def downloadVideo(self, download_path):
+
         options = {
             'outtmpl': f'{download_path}/%(title)s.%(ext)s',
-            'format': 'bestvideo+bestaudio',
+            'format': 'best',
             'quiet': True,
-            'no_warnings': True
+            'no_warnings': True,
         }
+
         with yt_dlp.YoutubeDL(options) as ydl:
             ydl.download([self.url])
