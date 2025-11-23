@@ -232,8 +232,8 @@ class App(ctk.CTk):
         self.progress_bar.place(x=150, y=310)
         
         # Create a label to display the percentage
-        self.progress_label = ctk.CTkLabel(self.download_window, text="0%", font=("Arial", 14))
-        self.progress_label.place(x=360, y=315)
+        self.progress_label = ctk.CTkLabel(self.download_window, text="....%", font=("Arial", 14))
+        self.progress_label.place(relx=0.5, y=340, anchor="center")
 
         # Store the last progress value to avoid jitter
         self.last_progress = 0
