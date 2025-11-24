@@ -13,13 +13,14 @@ class video:
         self.height = None
         self.width = None
         self.progress = 0
+        self.downloaded = None
     
     def getInformations(self):
         options = {
             'quiet': True,
             'no_warnings': True,
             'skip_download': True,
-            'format': 'bestvideo+bestaudio'
+            'format': 'best',
         }
         with yt_dlp.YoutubeDL(options) as ydl:
             info = ydl.extract_info(self.url, download=False)
@@ -76,13 +77,7 @@ class video:
 
         # convert size to MB or GB
         if size_in_bytes > 0:
-            size_in_mb = size_in_bytes / (1024 * 1024)
-
-            if size_in_mb > 1000:
-                size_in_gb = size_in_mb / (1024)
-                self.size = f"{size_in_gb:.2f} GB"
-            else:
-                self.size = f"{size_in_mb:.2f} MB"
+            self.size = self.convertBytes(size_in_bytes)
         else:
             # if size could not be determined just set it to unknown
             self.size = " Unknown Size"
@@ -100,11 +95,28 @@ class video:
         with yt_dlp.YoutubeDL(options) as downloader:
             downloader.download([self.url])
 
-
+    # a function to update the downloading percentage
     def progress_hook(self, d):
         if d['status'] == 'downloading':
-            downloaded = d.get('downloaded_bytes', 0)
-            total = d.get('total_bytes') or d.get('total_bytes_estimate') or 1
-            percent = downloaded / total * 100
+            # update the downloading percentage
+            downloaded_in_bytes = d.get('downloaded_bytes', 0)
+            total_in_bytes = d.get('total_bytes') or d.get('total_bytes_estimate') or 1
+            percent = downloaded_in_bytes / total_in_bytes * 100
 
+            # convert downloaded to KB or MB or GB
+            self.downloaded = self.convertBytes(downloaded_in_bytes)
+            # update the progress value
             self.progress = percent
+
+    def convertBytes(self, size_in_bytes):
+            
+            KB = size_in_bytes / (1024)
+            if KB < 1000:
+                return f"{KB:.2f} KB"
+            else:
+                MB = KB / 1024
+                if MB < 1000:
+                    return f"{MB:.2f} MB"
+                else:
+                    GB = MB / 1024
+                    return f"{GB:.2f} GB"

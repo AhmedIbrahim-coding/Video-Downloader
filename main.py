@@ -235,6 +235,10 @@ class App(ctk.CTk):
         self.progress_label = ctk.CTkLabel(self.download_window, text="....%", font=("Arial", 14))
         self.progress_label.place(relx=0.5, y=340, anchor="center")
 
+        # create a label to deplay the downloaded
+        self.downloaded_label = ctk.CTkLabel(self.download_window, text=f"--/{video_obj.size}", font=("Arial", 13))
+        self.downloaded_label.place(relx=0.5, y=290, anchor="center")
+
         # Store the last progress value to avoid jitter
         self.last_progress = 0
 
@@ -259,13 +263,16 @@ class App(ctk.CTk):
         # Update the percentage label
         if hasattr(self, 'progress_label') and self.progress_label.winfo_exists():
             self.progress_label.configure(text=f"{int(current_value*100)}%")
+            self.downloaded_label.configure(text=f"{video_obj.downloaded}/{video_obj.size}")
 
-        # Continue updating every 20 milliseconds until it reaches 100%
+        # Continue updating until it reaches 100%
         if current_value < 1:
-            self.after(20, self.update_progress_bar, video_obj)
+            self.after(1, self.update_progress_bar, video_obj)
         else:
             self.progress_bar.destroy()
-            done_label = ctk.CTkLabel(self.download_window, text="--Done--", text_color="green", font=("Arial", 14))
+            self.progress_label.destroy()
+            self.progress_label.destroy()
+            done_label = ctk.CTkLabel(self.download_window, text="---Done---", text_color="green", font=("Arial", 16))
             done_label.place(relx=0.5, y=310, anchor='center')
 
             
