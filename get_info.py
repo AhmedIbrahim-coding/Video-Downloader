@@ -29,6 +29,8 @@ class video:
             if self.info['height'] and self.info['width']:
                 self.height = self.info['height']
                 self.width = self.info['width']
+                print(self.height)
+                print(self.width)
             return self.info
         
         
@@ -82,31 +84,6 @@ class video:
             # if size could not be determined just set it to unknown
             self.size = " Unknown Size"
 
-    def downloadVideo(self, download_path):
-
-        options = {
-            'outtmpl': f'{download_path}/%(title)s.%(ext)s',
-            'format': 'best',
-            'quiet': True,
-            'no_warnings': True,
-            'progress_hooks': [self.progress_hook],
-        }
-
-        with yt_dlp.YoutubeDL(options) as downloader:
-            downloader.download([self.url])
-
-    # a function to update the downloading percentage
-    def progress_hook(self, d):
-        if d['status'] == 'downloading':
-            # update the downloading percentage
-            downloaded_in_bytes = d.get('downloaded_bytes', 0)
-            total_in_bytes = d.get('total_bytes') or d.get('total_bytes_estimate') or 1
-            percent = downloaded_in_bytes / total_in_bytes * 100
-
-            # convert downloaded to KB or MB or GB
-            self.downloaded = self.convertBytes(downloaded_in_bytes)
-            # update the progress value
-            self.progress = percent
 
     def convertBytes(self, size_in_bytes):
             

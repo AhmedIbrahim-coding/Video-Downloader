@@ -222,59 +222,6 @@ class App(ctk.CTk):
             self.download_location = folder_selected
             self.location_label.configure(text=self.download_location)
 
-    def DownloadVideo(self, video_obj):
-        # Remove the start download button
-        if hasattr(self, 'start_download_button'):
-            self.start_download_button.destroy()
-        
-        # Create a ProgressBar in place of the button
-        self.progress_bar = ctk.CTkProgressBar(self.download_window, width=400)
-        self.progress_bar.place(x=150, y=310)
-        
-        # Create a label to display the percentage
-        self.progress_label = ctk.CTkLabel(self.download_window, text="....%", font=("Arial", 14))
-        self.progress_label.place(relx=0.5, y=340, anchor="center")
-
-        # create a label to deplay the downloaded
-        self.downloaded_label = ctk.CTkLabel(self.download_window, text=f"--/{video_obj.size}", font=("Arial", 13))
-        self.downloaded_label.place(relx=0.5, y=290, anchor="center")
-
-        # Store the last progress value to avoid jitter
-        self.last_progress = 0
-
-        # Start the download in a separate thread
-        thread = threading.Thread(target=video_obj.downloadVideo, args=(self.download_location,))
-        thread.start()
-
-        # Start updating the ProgressBar
-        self.update_progress_bar(video_obj)
-
-    def update_progress_bar(self, video_obj):
-        # Prevent updating if the ProgressBar or Toplevel has been destroyed
-        if not hasattr(self, 'progress_bar') or not self.progress_bar.winfo_exists():
-            return
-
-        # Update the value while preventing backward movement
-        current_value = video_obj.progress / 100
-        current_value = max(current_value, getattr(self, 'last_progress', 0))
-        self.progress_bar.set(current_value)
-        self.last_progress = current_value
-
-        # Update the percentage label
-        if hasattr(self, 'progress_label') and self.progress_label.winfo_exists():
-            self.progress_label.configure(text=f"{int(current_value*100)}%")
-            self.downloaded_label.configure(text=f"{video_obj.downloaded}/{video_obj.size}")
-
-        # Continue updating until it reaches 100%
-        if current_value < 1:
-            self.after(1, self.update_progress_bar, video_obj)
-        else:
-            self.progress_bar.destroy()
-            self.progress_label.destroy()
-            self.progress_label.destroy()
-            done_label = ctk.CTkLabel(self.download_window, text="---Done---", text_color="green", font=("Arial", 16))
-            done_label.place(relx=0.5, y=310, anchor='center')
-
             
 if __name__ == "__main__":
     app = App()
