@@ -4,6 +4,7 @@ import threading
 from PIL import Image
 from tkinter import filedialog
 import os
+from Downloader import downloader
 
 class App(ctk.CTk):
     def __init__(self):
@@ -205,13 +206,14 @@ class App(ctk.CTk):
         choose_location_button.place(x=410, y=231)
 
         # Download button
+        download_thread = threading.Thread(target=self.DownloadVideo, args=(video_obj,))
         self.start_download_button = ctk.CTkButton(window,
                                               text="Start",
                                               width=100,
                                               height=30,
                                               corner_radius=3,
                                               font=("Arial", 16),
-                                              command=lambda: self.DownloadVideo(video_obj))
+                                              command=lambda: download_thread.start())
         self.start_download_button.place(x=600, y=310)
 
     def choose_location(self):
@@ -222,7 +224,10 @@ class App(ctk.CTk):
             self.download_location = folder_selected
             self.location_label.configure(text=self.download_location)
 
-            
+    def DownloadVideo(self, video_obj):
+        new_downloader = downloader(self.download_location, video_obj)
+        new_downloader.download_video()
+
 if __name__ == "__main__":
     app = App()
     app.mainloop()

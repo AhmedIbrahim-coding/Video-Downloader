@@ -9,18 +9,15 @@ class video:
         self.info = None
         self.duration = None
         self.size = None
-        self.quality = None
         self.height = None
         self.width = None
-        self.progress = 0
-        self.downloaded = None
-    
+
     def getInformations(self):
         options = {
             'quiet': True,
             'no_warnings': True,
             'skip_download': True,
-            'format': 'best',
+            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',
         }
         with yt_dlp.YoutubeDL(options) as ydl:
             info = ydl.extract_info(self.url, download=False)
@@ -29,8 +26,6 @@ class video:
             if self.info['height'] and self.info['width']:
                 self.height = self.info['height']
                 self.width = self.info['width']
-                print(self.height)
-                print(self.width)
             return self.info
         
         
@@ -74,8 +69,17 @@ class video:
         size_in_bytes = 0
 
         # git the size from the info dict
-        size_in_bytes = self.info.get('filesize') or self.info.get('filesize_approx') or 0
+        if "requested_formats" in self.info:
+            video_fmt = self.info['requested_formats'][0]
+            audio_fmt = self.info['requested_formats'][1]
+            
+            video_size = video_fmt.get('filesize') or video_fmt.get('filesize_approx')
+            audio_size = audio_fmt.get('filesize') or audio_fmt.get('filesize_approx')
 
+            size_in_bytes = video_size + audio_size
+        else:
+            fmt = self.info
+            size_in_bytes = fmt.get('filesize') or fmt.get('filesize_approx')
 
         # convert size to MB or GB
         if size_in_bytes > 0:
