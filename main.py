@@ -196,17 +196,17 @@ class App(ctk.CTk):
         self.location_label = ctk.CTkLabel(location_frame, text=self.download_location, font=("Arial", 14))
         self.location_label.place(x=32, y=2)
 
-        choose_location_button = ctk.CTkButton(window,
+        self.choose_location_button = ctk.CTkButton(window,
                                                text="Browse",
                                                width=80,
                                                height=30,
                                                corner_radius=1,
                                                font=("Arial", 14),
                                                command=self.choose_location)
-        choose_location_button.place(x=410, y=231)
+        self.choose_location_button.place(x=410, y=231)
 
         # Download button
-        download_thread = threading.Thread(target=self.DownloadVideo, args=(video_obj,))
+        download_thread = threading.Thread(target=self.DownloadVideo, args=(video_obj,)) # make it as a thread to run in background
         self.start_download_button = ctk.CTkButton(window,
                                               text="Start",
                                               width=100,
@@ -225,9 +225,28 @@ class App(ctk.CTk):
             self.location_label.configure(text=self.download_location)
 
     def DownloadVideo(self, video_obj):
-        new_downloader = downloader(self.download_location, video_obj)
-        new_downloader.download_video()
+        # distroy the download button & location button
+        self.start_download_button.destroy()
+        self.choose_location_button.destroy()
 
+        # create a new downloader object
+        new_downloader = downloader(self.download_location, video_obj)
+
+        # display the progress as a lable
+        self.progress_lable = ctk.CTkLabel(self.download_window, text="--/&")
+        self.progress_lable.place(relx = 0.5, y=310, anchor="center")
+
+        # run download func and call update progress func
+        new_downloader.download_video()
+        self.update_Progress(new_downloader)
+
+    def update_Progress(self, downloader):
+        if downloader.progress < 100:
+            self.progress_lable.configure(text=f"{downloader.progress}%")
+            self.after(1, self.update_Progress,args=(downloader,))
+        else:
+            self.download_window.destroy()
+        
 if __name__ == "__main__":
     app = App()
     app.mainloop()
