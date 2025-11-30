@@ -206,10 +206,6 @@ class App(ctk.CTk):
         self.choose_location_button.place(x=410, y=231)
 
         # Download button
-<<<<<<< HEAD
-=======
-        download_thread = threading.Thread(target=self.DownloadVideo, args=(video_obj,)) # make it as a thread to run in background
->>>>>>> 433a9c34fc4212bfed0704a057cc095e3314a22f
         self.start_download_button = ctk.CTkButton(window,
                                               text="Start",
                                               width=100,
@@ -228,42 +224,34 @@ class App(ctk.CTk):
             self.location_label.configure(text=self.download_location)
 
     def DownloadVideo(self, video_obj):
-<<<<<<< HEAD
         # if the download button exists, destroy it
         if self.start_download_button.winfo_exists():
             self.start_download_button.destroy()
 
-        # start the downloading process as a thread to run in the background
-        threading.Thread(target=self.Downloading_prosses,args=(video_obj,)).start()
+        # create a progress label
+        self.progrss_label = ctk.CTkLabel(self.download_window ,text="--%")
+        self.progrss_label.place(relx=0.5, y=310, anchor="center")
 
-    def Downloading_prosses(self, video_obj):
         # crate a new downloader object
         new_downloader = downloader(self.download_location, video_obj)
-        new_downloader.download_video()
-=======
-        # distroy the download button & location button
-        self.start_download_button.destroy()
-        self.choose_location_button.destroy()
 
-        # create a new downloader object
-        new_downloader = downloader(self.download_location, video_obj)
+        # start the downloading process as a thread to run in the background
+        threading.Thread(target=self.Downloading_prosses,args=(new_downloader,)).start()
 
-        # display the progress as a lable
-        self.progress_lable = ctk.CTkLabel(self.download_window, text="--/&")
-        self.progress_lable.place(relx = 0.5, y=310, anchor="center")
+    def Downloading_prosses(self, downloader_obj):
+        # start download func
+        downloader_obj.download_video()
+        self.after(0, self.update_progress, downloader_obj)
 
-        # run download func and call update progress func
-        new_downloader.download_video()
-        self.update_Progress(new_downloader)
 
-    def update_Progress(self, downloader):
-        if downloader.progress < 100:
-            self.progress_lable.configure(text=f"{downloader.progress}%")
-            self.after(1, self.update_Progress,args=(downloader,))
+    def update_progress(self, downloader_obj):
+        if downloader_obj.progress == 100:
+            return
         else:
-            self.download_window.destroy()
-        
->>>>>>> 433a9c34fc4212bfed0704a057cc095e3314a22f
+            if downloader_obj.progress:
+                self.progrss_label.configure(text=f"{downloader_obj.progress:.1f}%")
+            self.after(100, self.update_progress, downloader_obj)
+
 if __name__ == "__main__":
     app = App()
     app.mainloop()

@@ -29,3 +29,5 @@ class downloader:
         if d['status'] == 'downloading':
             downloaded_in_bytes = d.get('downloaded_bytes', 0)
             self.progress = (downloaded_in_bytes / self.total) * 100
+        elif d['status'] == 'finished':
+            self.progress = 100
