@@ -11,6 +11,7 @@ class video:
         self.size = None
         self.height = None
         self.width = None
+        self.total_size_bytes = None
 
     def getInformations(self):
         options = {
@@ -88,6 +89,7 @@ class video:
             # if size could not be determined just set it to unknown
             self.size = " Unknown Size"
 
+        self.total_size_bytes = size_in_bytes
 
     def convertBytes(self, size_in_bytes):
             
