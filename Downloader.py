@@ -14,6 +14,8 @@ class downloader:
         self.downloaded_video = 0
         self.dowlnoaded_audio = 0
 
+        self.speed = None
+
     def download_video(self):
         # get the video object that already determined above
         video = self.video
@@ -64,7 +66,26 @@ class downloader:
             if total_downloaded > 0:
                 self.progress = (total_downloaded/ self.video_total) * 100
 
+            # get the downloading speed
+            speed_in_bytes = d.get('speed')
+            self.speed = self.convert_bytes(speed_in_bytes)
+
         else:
             # if the statu is merging the audio and video or finished, set the progress to 100
             self.progress = 100
         
+
+    def convert_bytes(self, bytes):
+        if bytes > 1024:
+            KB = bytes / 1024
+            if KB > 1024:
+                MB = KB / 1024
+                if MB > 1024:
+                    GB = MB / 1024
+                    return f"{GB:.2f}GB/s"
+                else:
+                    return f"{MB:.2f}MB/s"
+            else:
+                return f"{KB:.2f}KB/s"
+        else:
+            return f"{bytes:.2f}B/s"

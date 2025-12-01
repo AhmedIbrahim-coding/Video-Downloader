@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import tkinter as tk
 from get_info import video
 import threading
 from PIL import Image
@@ -16,6 +17,14 @@ class App(ctk.CTk):
         self.video_info = None
         self.download_location = os.path.join(os.path.expanduser("~"), "Downloads")
         
+        # type my name well, i mean i am gonna do that you know (-_-)
+        my_name = ctk.CTkLabel(self, text="By/ Taher Eladawy", font=("Arial", 12))
+        my_name.place(x=10, y=170)
+
+        # set an icon for the app
+        self.iconbitmap("DownTube_icon.ico")
+
+
         # Link entry
         self.linkEntry = ctk.CTkEntry(self,
                                        width=450,
@@ -61,6 +70,7 @@ class App(ctk.CTk):
         window.resizable(False, False)
         window.grab_set()  # Make this window modal
         window.focus_set()
+
 
         # write a temorary lable to show that the download is being prepared
         self.temp_label_massage = ctk.CTkLabel(window, text="Preparing download....", font=("Arial", 32))
@@ -229,12 +239,17 @@ class App(ctk.CTk):
             self.start_download_button.destroy()
 
         # create a progress label
-        self.progrss_label = ctk.CTkLabel(self.download_window ,text="--%")
+        self.progrss_label = ctk.CTkLabel(self.download_window ,text="")
         self.progrss_label.place(relx=0.5, y=310, anchor="center")
 
         # create a progress bar
         self.progress_bar = ctk.CTkProgressBar(self.download_window, width=400, height=5, corner_radius=3)
         self.progress_bar.place(relx=0.5, y=320, anchor="center")
+        self.progress_bar.set(0)
+
+        # display a speed label
+        self.speed_label = ctk.CTkLabel(self.download_window, text="")
+        self.speed_label.place(relx=0.5, y=340, anchor="center")
 
         # crate a new downloader object
         new_downloader = downloader(self.download_location, video_obj)
@@ -252,6 +267,7 @@ class App(ctk.CTk):
         if downloader_obj.progress == 100:
             self.progrss_label.configure(text="100%")
             self.progress_bar.set(1)
+            self.download_window.destroy()
 
         else:  
             if downloader_obj.progress:# check first if there is a value inside progress
@@ -261,6 +277,10 @@ class App(ctk.CTk):
                 # set the progress bar to a value from 0 to 1
                 bar_value = downloader_obj.progress/100
                 self.progress_bar.set(bar_value)
+
+                # configure the speed label
+                if downloader_obj.speed != None:
+                 self.speed_label.configure(text=downloader_obj.speed)
             self.after(10, self.update_progress, downloader_obj) #keep upadting the progress lable every 0.01 seconds
 
 if __name__ == "__main__":
