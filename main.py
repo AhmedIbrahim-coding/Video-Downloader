@@ -237,11 +237,11 @@ class App(ctk.CTk):
 
         # start the downloading process as a thread to run in the background
         threading.Thread(target=self.Downloading_prosses,args=(new_downloader,)).start()
+        self.after(0, self.update_progress, new_downloader)
 
     def Downloading_prosses(self, downloader_obj):
         # start download func
         downloader_obj.download_video()
-        self.after(0, self.update_progress, downloader_obj)
 
 
     def update_progress(self, downloader_obj):
@@ -250,7 +250,7 @@ class App(ctk.CTk):
         else:
             if downloader_obj.progress:
                 self.progrss_label.configure(text=f"{downloader_obj.progress:.1f}%")
-            self.after(100, self.update_progress, downloader_obj)
+            self.after(10, self.update_progress, downloader_obj) #keep upadting the progress lable every 0.01 seconds
 
 if __name__ == "__main__":
     app = App()
