@@ -232,6 +232,10 @@ class App(ctk.CTk):
         self.progrss_label = ctk.CTkLabel(self.download_window ,text="--%")
         self.progrss_label.place(relx=0.5, y=310, anchor="center")
 
+        # create a progress bar
+        self.progress_bar = ctk.CTkProgressBar(self.download_window, width=400, height=5, corner_radius=3)
+        self.progress_bar.place(relx=0.5, y=320, anchor="center")
+
         # crate a new downloader object
         new_downloader = downloader(self.download_location, video_obj)
 
@@ -246,10 +250,17 @@ class App(ctk.CTk):
 
     def update_progress(self, downloader_obj):
         if downloader_obj.progress == 100:
-            return
-        else:
-            if downloader_obj.progress:
+            self.progrss_label.configure(text="100%")
+            self.progress_bar.set(1)
+
+        else:  
+            if downloader_obj.progress:# check first if there is a value inside progress
+                # set progress label to current progress
                 self.progrss_label.configure(text=f"{downloader_obj.progress:.1f}%")
+
+                # set the progress bar to a value from 0 to 1
+                bar_value = downloader_obj.progress/100
+                self.progress_bar.set(bar_value)
             self.after(10, self.update_progress, downloader_obj) #keep upadting the progress lable every 0.01 seconds
 
 if __name__ == "__main__":
