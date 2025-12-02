@@ -18,34 +18,34 @@ class downloader:
         self.speed = None
 
         
-def download_video(self):
-    video = self.video
-    video_info = video.info
-    video_title = video_info.get('title')
+    def download_video(self):
+        video = self.video
+        video_info = video.info
+        video_title = video_info.get('title')
 
-    # المسار الأساسي للفيديو مباشرة في مجلد التنزيل
-    base_path = os.path.join(self.location, f"{video_title}.mp4")
-    self.video_path = base_path
+        # المسار الأساسي للفيديو مباشرة في مجلد التنزيل
+        base_path = os.path.join(self.location, f"{video_title}.mp4")
+        self.video_path = base_path
 
-    # تجنب أسماء متكررة
-    num = 1
-    while os.path.isfile(self.video_path):
-        self.video_path = os.path.join(self.location, f"{video_title}({num}).mp4")
-        num += 1
+        # تجنب أسماء متكررة
+        num = 1
+        while os.path.isfile(self.video_path):
+            self.video_path = os.path.join(self.location, f"{video_title}({num}).mp4")
+            num += 1
 
-    # خيارات التحميل
-    opt = {
-        "ffmpeg_location": self.get_ffmpeg_path(),
-        "no_warnings": True,
-        "quiet": True,
-        "outtmpl": self.video_path,  # الفيديو يخرج مباشرة بدون فولدر
-        "format": f"bestvideo[width={video.width}][height={video.height}][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
-        "merge_output_format": "mp4",
-        "progress_hooks": [self.progress_Hook],
-    }
+        # خيارات التحميل
+        opt = {
+            "ffmpeg_location": self.get_ffmpeg_path(),
+            "no_warnings": True,
+            "quiet": True,
+            "outtmpl": self.video_path,  # الفيديو يخرج مباشرة بدون فولدر
+            "format": f"bestvideo[width={video.width}][height={video.height}][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
+            "merge_output_format": "mp4",
+            "progress_hooks": [self.progress_Hook],
+        }
 
-    with yt_dlp.YoutubeDL(opt) as downloader:
-        downloader.download([video.url])
+        with yt_dlp.YoutubeDL(opt) as downloader:
+            downloader.download([video.url])
 
     def progress_Hook(self, d):
         # get the statu and store it
