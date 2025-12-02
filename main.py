@@ -1,11 +1,17 @@
 import customtkinter as ctk
-import tkinter as tk
 from get_info import video
 import threading
 from PIL import Image
 from tkinter import filedialog
-import os
+import os, sys
 from Downloader import downloader
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):  # Running as EXE
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)  # Running normally
+
+ctk.set_appearance_mode("Dark")
 
 class App(ctk.CTk):
     def __init__(self):
@@ -18,11 +24,11 @@ class App(ctk.CTk):
         self.download_location = os.path.join(os.path.expanduser("~"), "Downloads")
         
         # type my name well, i mean i am gonna do that you know (-_-)
-        my_name = ctk.CTkLabel(self, text="By/ Taher Eladawy", font=("Arial", 12))
+        my_name = ctk.CTkLabel(self, text="By/ Ahmed Ibrahim", font=("Arial", 12))
         my_name.place(x=10, y=170)
 
         # set an icon for the app
-        self.iconbitmap("DownTube_icon.ico")
+        self.iconbitmap(resource_path("DownTube_icon.ico"))
 
 
         # Link entry
@@ -146,7 +152,7 @@ class App(ctk.CTk):
         video_title.place(x=350, y=20)
 
         # display video duration
-        pil_duration_icon = Image.open("Duration_icon.png")
+        pil_duration_icon = Image.open(resource_path("Duration_icon.png"))
         duration_icon = ctk.CTkImage(light_image= pil_duration_icon,
                                      dark_image= pil_duration_icon,
                                      size=(20, 20))
@@ -160,7 +166,7 @@ class App(ctk.CTk):
         duration_label.place(x=375, y=70)
 
         # display video file size
-        pil_size_icon = Image.open("Size_icon.png")
+        pil_size_icon = Image.open(resource_path("Size_icon.png"))
         size_icon = ctk.CTkImage(light_image= pil_size_icon,
                                  dark_image= pil_size_icon,
                                  size=(20, 20))
@@ -174,7 +180,7 @@ class App(ctk.CTk):
         size_label.place(x=375, y=100)
 
         # display video quality
-        pil_display_icon = Image.open("Display_icon.png")
+        pil_display_icon = Image.open(resource_path("Display_icon.png"))
         display_icon = ctk.CTkImage(light_image= pil_display_icon,
                                     dark_image= pil_display_icon,
                                     size=(20, 20))
@@ -195,7 +201,7 @@ class App(ctk.CTk):
         location_frame.place(x=10, y=230)
 
         # display location icon
-        pil_location_icon = Image.open("Location_icon.png")
+        pil_location_icon = Image.open(resource_path("Location_icon.png"))
         location_icon = ctk.CTkImage(light_image= pil_location_icon,
                                      dark_image= pil_location_icon,
                                      size=(25, 25))
