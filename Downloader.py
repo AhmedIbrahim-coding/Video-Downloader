@@ -1,5 +1,5 @@
 import yt_dlp
-import os
+import os, sys
 
 class downloader:
     def __init__(self, location, video):
@@ -18,38 +18,34 @@ class downloader:
         self.speed = None
 
         
-    def download_video(self):
-        # get the video object that already determined above
-        video = self.video
+def download_video(self):
+    video = self.video
+    video_info = video.info
+    video_title = video_info.get('title')
 
-        # preaper the video path to download
-        video_info = self.video.info
-        video_title = f"{video_info.get('title')}.mp4"
-        self.video_path = os.path.join(self.location, video_title)
-        
-        num = 1
-        if os.path.isfile(self.video_path):# check if there is already a video with this name in the same path
-            while True: # start a while loop to add an addition to the name if there is already one
-                new_title = f"{video_info.get('title')}({num}).mp4"  # create a temp title that conatins the name + a number <<num>>
-                new_path = os.path.join(self.location, new_title)  # create a tamp path to hold the new title
-                if not os.path.isfile(new_path): # if there is no any name like this one give it to the original video path & break the loop
-                    self.video_path = new_path
-                    break
-                num += 1 # if the name still exist encrease the <<num>> and remake the loop
+    # المسار الأساسي للفيديو مباشرة في مجلد التنزيل
+    base_path = os.path.join(self.location, f"{video_title}.mp4")
+    self.video_path = base_path
 
+    # تجنب أسماء متكررة
+    num = 1
+    while os.path.isfile(self.video_path):
+        self.video_path = os.path.join(self.location, f"{video_title}({num}).mp4")
+        num += 1
 
-        # prepare the options 
-        opt = {
-            "no_warnings": True,
-            "quiet": True,
-            "outtmpl": self.video_path,
-            "format": f"bestvideo[width={video.width}][height={video.height}][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
-            "merge_output_format": "mp4",
-            "progress_hooks": [self.progress_Hook],
-        }
+    # خيارات التحميل
+    opt = {
+        "ffmpeg_location": self.get_ffmpeg_path(),
+        "no_warnings": True,
+        "quiet": True,
+        "outtmpl": self.video_path,  # الفيديو يخرج مباشرة بدون فولدر
+        "format": f"bestvideo[width={video.width}][height={video.height}][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
+        "merge_output_format": "mp4",
+        "progress_hooks": [self.progress_Hook],
+    }
 
-        with yt_dlp.YoutubeDL(opt) as downloader:
-            downloader.download(video.url)
+    with yt_dlp.YoutubeDL(opt) as downloader:
+        downloader.download([video.url])
 
     def progress_Hook(self, d):
         # get the statu and store it
@@ -107,3 +103,8 @@ class downloader:
                 return f"{KB:.2f}KB/s"
         else:
             return f"{bytes:.2f}B/s"
+        
+    def get_ffmpeg_path(self):
+        if hasattr(sys, "_MEIPASS"):
+            return os.path.join(sys._MEIPASS, "ffmpeg.exe")
+        return "ffmpeg"

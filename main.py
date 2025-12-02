@@ -11,6 +11,7 @@ def resource_path(relative_path):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("."), relative_path)  # Running normally
 
+# set the appearance automatically to dark
 ctk.set_appearance_mode("Dark")
 
 class App(ctk.CTk):
