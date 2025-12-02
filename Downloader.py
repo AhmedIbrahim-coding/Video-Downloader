@@ -1,4 +1,5 @@
 import yt_dlp
+import os
 
 class downloader:
     def __init__(self, location, video):
@@ -16,15 +17,32 @@ class downloader:
 
         self.speed = None
 
+        
     def download_video(self):
         # get the video object that already determined above
         video = self.video
+
+        # preaper the video path to download
+        video_info = self.video.info
+        video_title = f"{video_info.get('title')}.mp4"
+        self.video_path = os.path.join(self.location, video_title)
+        
+        num = 1
+        if os.path.isfile(self.video_path):# check if there is already a video with this name in the same path
+            while True: # start a while loop to add an addition to the name if there is already one
+                new_title = f"{video_info.get('title')}({num}).mp4"  # create a temp title that conatins the name + a number <<num>>
+                new_path = os.path.join(self.location, new_title)  # create a tamp path to hold the new title
+                if not os.path.isfile(new_path): # if there is no any name like this one give it to the original video path & break the loop
+                    self.video_path = new_path
+                    break
+                num += 1 # if the name still exist encrease the <<num>> and remake the loop
+
 
         # prepare the options 
         opt = {
             "no_warnings": True,
             "quiet": True,
-            "outtmpl": f"{self.location}/%(title)s.%(ext)s",
+            "outtmpl": self.video_path,
             "format": f"bestvideo[width={video.width}][height={video.height}][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
             "merge_output_format": "mp4",
             "progress_hooks": [self.progress_Hook],
