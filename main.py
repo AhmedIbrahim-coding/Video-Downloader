@@ -6,6 +6,7 @@ from tkinter import filedialog
 import os, sys
 from Downloader import downloader
 
+# a func to import any item as a code or exe file
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):  # Running as EXE
         return os.path.join(sys._MEIPASS, relative_path)

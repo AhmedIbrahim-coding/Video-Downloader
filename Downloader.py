@@ -1,5 +1,6 @@
 import yt_dlp
 import os, sys
+import re
 
 class downloader:
     def __init__(self, location, video):
@@ -22,23 +23,18 @@ class downloader:
         video = self.video
         video_info = video.info
         video_title = video_info.get('title')
+        video_title = re.sub(r'[^\w\s-]', '', video_title)
 
-        # المسار الأساسي للفيديو مباشرة في مجلد التنزيل
-        base_path = os.path.join(self.location, f"{video_title}.mp4")
-        self.video_path = base_path
+        # the path for downloading the video
+        path = os.path.join(self.location, f"{video_title}.mp4")
+        self.video_path = self.unique_path(path)
 
-        # تجنب أسماء متكررة
-        num = 1
-        while os.path.isfile(self.video_path):
-            self.video_path = os.path.join(self.location, f"{video_title}({num}).mp4")
-            num += 1
-
-        # خيارات التحميل
+        # Download options
         opt = {
             "ffmpeg_location": self.get_ffmpeg_path(),
             "no_warnings": True,
             "quiet": True,
-            "outtmpl": self.video_path,  # الفيديو يخرج مباشرة بدون فولدر
+            "outtmpl": self.video_path,
             "format": f"bestvideo[width={video.width}][height={video.height}][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
             "merge_output_format": "mp4",
             "progress_hooks": [self.progress_Hook],
@@ -107,4 +103,17 @@ class downloader:
     def get_ffmpeg_path(self):
         if hasattr(sys, "_MEIPASS"):
             return os.path.join(sys._MEIPASS, "ffmpeg.exe")
-        return "ffmpeg"
+        return "D:\\Programs setup\\Windows 10\\Media\\ffmpeg-7.1.1-essentials_build\\bin"
+    
+    def unique_path(self, path):
+        # split the path to base and exit
+        base, ext = os.path.splitext(path)
+
+        # avoid repititve names
+        counter = 1
+        while os.path.isfile(path):
+            path = f"{base}({counter}){ext}"
+            counter += 1
+
+        # return the final path form
+        return path
