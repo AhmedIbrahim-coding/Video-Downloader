@@ -95,7 +95,7 @@ class App(ctk.CTk):
                 # 1. Get the info
                 video_info = video_obj.getInformations()
                 
-                # 2. CHECK: Is it actually a video?
+                # 2. Check Is it actually a video?
                 is_live = video_info.get('is_live', False)
                 duration = video_info.get('duration')
 

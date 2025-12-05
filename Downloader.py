@@ -103,7 +103,9 @@ class downloader:
     def get_ffmpeg_path(self):
         if hasattr(sys, "_MEIPASS"):
             return os.path.join(sys._MEIPASS, "ffmpeg.exe")
-        return "D:\\Programs setup\\Windows 10\\Media\\ffmpeg-7.1.1-essentials_build\\bin"
+        print(os.path.join(os.getcwd(), "FFmpeg", "bin"))
+        return os.path.join(os.getcwd(), "FFmpeg", "bin")
+        
     
     def unique_path(self, path):
         # split the path to base and exit
