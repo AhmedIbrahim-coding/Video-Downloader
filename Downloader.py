@@ -1,6 +1,7 @@
 import yt_dlp
 import os, sys
 import re
+import time
 
 class downloader:
     def __init__(self, location, video):
@@ -17,6 +18,7 @@ class downloader:
         self.dowlnoaded_audio = 0
 
         self.speed = None
+        self.is_Paused = True
 
         
     def download_video(self):
@@ -44,6 +46,10 @@ class downloader:
             downloader.download([video.url])
 
     def progress_Hook(self, d):
+        # make it pause when self.is_paused True
+        while self.is_Paused:
+            time.sleep(0.2)
+            
         # get the statu and store it
         statu = d.get('status')
 
