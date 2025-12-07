@@ -18,7 +18,7 @@ class downloader:
         self.dowlnoaded_audio = 0
 
         self.speed = None
-        self.is_Paused = True
+        self.is_paused = False
 
         
     def download_video(self):
@@ -47,13 +47,17 @@ class downloader:
 
     def progress_Hook(self, d):
         # make it pause when self.is_paused True
-        while self.is_Paused:
+        while self.is_paused:
             time.sleep(0.2)
-            
-        # get the statu and store it
-        statu = d.get('status')
 
-        if statu == 'downloading':
+        # get the statu and store it
+        status = d.get('status')
+
+        if status == 'finished':
+            # if the statu is merging the audio and video or finished, set the progress to 100
+            self.progress = 100
+
+        else :
             # get the information and fomat about the statu
             info = d.get('info_dict', {})
             fmt = d.get('format_id', "")
@@ -85,10 +89,6 @@ class downloader:
             # get the downloading speed
             speed_in_bytes = d.get('speed')
             self.speed = self.convert_bytes(speed_in_bytes)
-
-        else:
-            # if the statu is merging the audio and video or finished, set the progress to 100
-            self.progress = 100
         
 
     def convert_bytes(self, bytes):

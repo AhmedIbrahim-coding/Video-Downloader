@@ -257,7 +257,7 @@ class App(ctk.CTk):
 
         # display a speed label
         self.speed_label = ctk.CTkLabel(self.download_window, text="")
-        self.speed_label.place(relx=0.5, y=340, anchor="center")
+        self.speed_label.place(x=570, y=305)
 
         # crate a new downloader object
         new_downloader = downloader(self.download_location, video_obj)
@@ -266,9 +266,47 @@ class App(ctk.CTk):
         threading.Thread(target=self.Downloading_prosses,args=(new_downloader,)).start()
         self.after(0, self.update_progress, new_downloader)
 
+
+        # Pause Button
+        pil_pause_icon = Image.open(resource_path("Pause_icon.png"))
+        pil_continue_icon = Image.open(resource_path("Continue_icon.png"))
+        self.pause_icon = ctk.CTkImage(light_image=pil_pause_icon,
+                                       dark_image=pil_pause_icon,
+                                       size=(20, 20))
+        self.continue_icon = ctk.CTkImage(light_image=pil_continue_icon,
+                                          dark_image=pil_continue_icon,
+                                          size=(20,20))
+        self.pause_button = ctk.CTkButton(self.download_window, 
+                                     width=35, 
+                                     height=20, 
+                                     corner_radius=0, 
+                                     text="",
+                                     fg_color="#1F6AA5",
+                                     image=self.pause_icon, 
+                                     command=lambda:self.Pause_process(new_downloader))
+        self.pause_button.place(relx=0.5, y=340, anchor="center")
+
+
+
     def Downloading_prosses(self, downloader_obj):
         # start download func
         downloader_obj.download_video()
+
+
+    def Pause_process(self, downloader_obj):
+        # set progress label to current progress
+        self.progrss_label.configure(text=f"{downloader_obj.progress:.1f}%")
+        
+        is_paused = downloader_obj.is_paused
+
+        if is_paused:
+            is_paused = False
+            self.pause_button.configure(image=self.pause_icon, fg_color="#1F6AA5")
+        else:
+            is_paused = True
+            self.pause_button.configure(image=self.continue_icon, fg_color="orange")
+
+        downloader_obj.is_paused = is_paused
 
 
     def update_progress(self, downloader_obj):
