@@ -19,6 +19,7 @@ class downloader:
 
         self.speed = None
         self.is_paused = False
+        self.is_canceld = False
 
         
     def download_video(self):
@@ -42,10 +43,24 @@ class downloader:
             "progress_hooks": [self.progress_Hook],
         }
 
-        with yt_dlp.YoutubeDL(opt) as downloader:
-            downloader.download([video.url])
+        try:
+            with yt_dlp.YoutubeDL(opt) as downloader:
+                downloader.download([video.url])
+        except yt_dlp.utils.DowloadCanceled:
+            print("Download is canceled by the user")
+
+        finally:
+            folder = self.location
+            for file in os.listdir(folder):
+                if file.endswith(".part"):
+                    os.remove(os.path.join(folder, file))
 
     def progress_Hook(self, d):
+        # exit if the downloading process is canceld
+        if self.is_canceld:
+            raise yt_dlp.utils.DownloadCanceled
+        
+
         # make it pause when self.is_paused True
         while self.is_paused:
             time.sleep(0.2)
@@ -109,7 +124,6 @@ class downloader:
     def get_ffmpeg_path(self):
         if hasattr(sys, "_MEIPASS"):
             return os.path.join(sys._MEIPASS, "ffmpeg.exe")
-        print(os.path.join(os.getcwd(), "FFmpeg", "bin"))
         return os.path.join(os.getcwd(), "FFmpeg", "bin")
         
     

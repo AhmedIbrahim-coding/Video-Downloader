@@ -24,7 +24,8 @@ class App(ctk.CTk):
         self.video_link = None
         self.video_info = None
         self.download_location = os.path.join(os.path.expanduser("~"), "Downloads")
-        
+
+
         # type my name well, i mean i am gonna do that you know (-_-)
         my_name = ctk.CTkLabel(self, text="By/ Ahmed Ibrahim", font=("Arial", 12))
         my_name.place(x=10, y=170)
@@ -78,7 +79,6 @@ class App(ctk.CTk):
         window.resizable(False, False)
         window.grab_set()  # Make this window modal
         window.focus_set()
-
 
         # write a temorary lable to show that the download is being prepared
         self.temp_label_massage = ctk.CTkLabel(window, text="Preparing download....", font=("Arial", 32))
@@ -246,6 +246,7 @@ class App(ctk.CTk):
         if self.start_download_button.winfo_exists():
             self.start_download_button.destroy()
 
+
         # create a progress label
         self.progrss_label = ctk.CTkLabel(self.download_window ,text="")
         self.progrss_label.place(relx=0.5, y=310, anchor="center")
@@ -262,8 +263,15 @@ class App(ctk.CTk):
         # crate a new downloader object
         new_downloader = downloader(self.download_location, video_obj)
 
+        # make the downloading process cancel when the user closes the download window
+        self.download_window.protocol("WM_DELETE_WINDOW", lambda: self.on_close(new_downloader))
+
         # start the downloading process as a thread to run in the background
-        threading.Thread(target=self.Downloading_prosses,args=(new_downloader,)).start()
+        self.download_thread = threading.Thread(target=self.Downloading_prosses,
+                                                args=(new_downloader,),
+                                                daemon=True
+                                                )
+        self.download_thread.start()
         self.after(0, self.update_progress, new_downloader)
 
 
@@ -272,13 +280,13 @@ class App(ctk.CTk):
         pil_continue_icon = Image.open(resource_path("Continue_icon.png"))
         self.pause_icon = ctk.CTkImage(light_image=pil_pause_icon,
                                        dark_image=pil_pause_icon,
-                                       size=(20, 20))
+                                       size=(15, 15))
         self.continue_icon = ctk.CTkImage(light_image=pil_continue_icon,
                                           dark_image=pil_continue_icon,
-                                          size=(20,20))
+                                          size=(15,15))
         self.pause_button = ctk.CTkButton(self.download_window, 
                                      width=35, 
-                                     height=20, 
+                                     height=30, 
                                      corner_radius=0, 
                                      text="",
                                      fg_color="#1F6AA5",
@@ -286,7 +294,12 @@ class App(ctk.CTk):
                                      command=lambda:self.Pause_process(new_downloader))
         self.pause_button.place(relx=0.5, y=340, anchor="center")
 
-
+    def on_close(self, downloader_obj):
+        # if the video still downloading cancel it
+        if downloader_obj.progress < 100:
+            downloader_obj.is_canceld = True
+        # destroy the window as normal
+        self.download_window.destroy()
 
     def Downloading_prosses(self, downloader_obj):
         # start download func
@@ -310,9 +323,13 @@ class App(ctk.CTk):
 
 
     def update_progress(self, downloader_obj):
+        if not self.download_window or not self.download_window.winfo_exists():
+            return
+
         if downloader_obj.progress == 100:
             self.progrss_label.configure(text="100%")
             self.progress_bar.set(1)
+            self.is_downloading = False
             self.download_window.destroy()
 
         else:  
@@ -327,6 +344,7 @@ class App(ctk.CTk):
                 # configure the speed label
                 if downloader_obj.speed != None:
                  self.speed_label.configure(text=downloader_obj.speed)
+            self.is_downloading = True
             self.after(10, self.update_progress, downloader_obj) #keep upadting the progress lable every 0.01 seconds
 
 if __name__ == "__main__":
