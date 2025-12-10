@@ -336,10 +336,17 @@ class App(ctk.CTk):
 
     def on_close(self, downloader_obj):
         # if the video still downloading cancel it
-        if downloader_obj.progress < 100:
-            downloader_obj.is_canceld = True
+        try:
+            if downloader_obj.progress and downloader_obj.progress < 100:
+                downloader_obj.is_canceld = True
+        except Exception as e:
+            print(f"Error setting cancel flag: {e}")
+        
         # destroy the window as normal
-        self.download_window.destroy()
+        try:
+            self.download_window.destroy()
+        except Exception:
+            pass
 
     def Downloading_prosses(self, downloader_obj):
         # start download func
@@ -363,29 +370,33 @@ class App(ctk.CTk):
 
 
     def update_progress(self, downloader_obj):
-        if not self.download_window or not self.download_window.winfo_exists():
-            return
+        try:
+            if not self.download_window or not self.download_window.winfo_exists():
+                return
 
-        if downloader_obj.progress == 100:
-            self.progrss_label.configure(text="100%")
-            self.progress_bar.set(1)
-            self.is_downloading = False
-            self.download_window.destroy()
+            if downloader_obj.progress == 100:
+                self.progrss_label.configure(text="100%")
+                self.progress_bar.set(1)
+                self.is_downloading = False
+                if self.download_window.winfo_exists():
+                    self.download_window.destroy()
 
-        else:  
-            if downloader_obj.progress:# check first if there is a value inside progress
-                # set progress label to current progress
-                self.progrss_label.configure(text=f"{downloader_obj.progress:.1f}%")
+            else:  
+                if downloader_obj.progress is not None:  # check first if there is a value inside progress
+                    # set progress label to current progress
+                    self.progrss_label.configure(text=f"{downloader_obj.progress:.1f}%")
 
-                # set the progress bar to a value from 0 to 1
-                bar_value = downloader_obj.progress/100
-                self.progress_bar.set(bar_value)
+                    # set the progress bar to a value from 0 to 1
+                    bar_value = downloader_obj.progress/100
+                    self.progress_bar.set(bar_value)
 
-                # configure the speed label
-                if downloader_obj.speed != None:
-                 self.speed_label.configure(text=downloader_obj.speed)
-            self.is_downloading = True
-            self.after(10, self.update_progress, downloader_obj) #keep upadting the progress lable every 0.01 seconds
+                    # configure the speed label
+                    if downloader_obj.speed is not None:
+                        self.speed_label.configure(text=downloader_obj.speed)
+                self.is_downloading = True
+                self.after(10, self.update_progress, downloader_obj)  # keep updating the progress label every 0.01 seconds
+        except Exception as e:
+            print(f"Error in update_progress: {e}")
 
 if __name__ == "__main__":
     app = App()
