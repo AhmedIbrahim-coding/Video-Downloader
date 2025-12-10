@@ -223,6 +223,12 @@ class App(ctk.CTk):
                                                command=self.choose_location)
         self.choose_location_button.place(x=410, y=231)
 
+        # Choose Quality drop box
+        opt = video_obj.get_Qualities() # get the resolutions list
+        opt_box = ctk.CTkComboBox(window, values=opt, height=30, width=150, command=self.choose_quality)
+        opt_box.place(x=20, y=310)
+        opt_box.set(opt[-1]) # set the heighst quality as default
+
         # Download button
         self.start_download_button = ctk.CTkButton(window,
                                               text="Start",
@@ -240,6 +246,9 @@ class App(ctk.CTk):
             # set the download locatoin variable
             self.download_location = folder_selected
             self.location_label.configure(text=self.download_location)
+
+    def choose_quality(slef, choise):
+        print(choise) # a temp printing
 
     def DownloadVideo(self, video_obj):
         # if the download button exists, destroy it

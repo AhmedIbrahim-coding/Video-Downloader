@@ -12,6 +12,7 @@ class video:
         self.height = None
         self.width = None
         self.total_size_bytes = None
+        self.formats = []
 
     def getInformations(self):
         options = {
@@ -103,3 +104,13 @@ class video:
                 else:
                     GB = MB / 1024
                     return f"{GB:.2f} GB"
+                
+    def get_Qualities(self):
+        formats = self.info.get("formats")
+        qualitites = []
+        for f in formats:
+            if f.get("height") and f.get("width") and f.get("vcodec") and f.get("height") > 144 and int(f['format_id']) >= 395:
+                self.formats.append(f)
+                resolution = f.get("resolution")
+                qualitites.append(resolution)
+        return qualitites
