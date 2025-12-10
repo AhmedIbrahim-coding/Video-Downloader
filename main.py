@@ -2,7 +2,8 @@ import customtkinter as ctk
 from get_info import video
 import threading
 from PIL import Image
-from tkinter import filedialog
+from tkinter import filedialog, font as tkFont
+import tkinter as tk
 import os, sys
 from Downloader import downloader
 
@@ -43,6 +44,23 @@ class App(ctk.CTk):
                                        font=("Arial", 14))
         self.linkEntry.pack(pady=20)
 
+        # add a menu when right click on link entry
+        self.menu = tk.Menu(self, 
+                            tearoff=0,
+                            fg="white",
+                            bg="#1f1f1f",
+                            bd=0,
+                            activebackground="#3d3d3d",
+                            activeforeground="white",
+                            font=tkFont.Font(family="Arial", size=10))
+        
+        # add commands to the menu {copy, past, cut}
+        self.menu.add_command(label="Past", command=lambda: self.linkEntry.insert("insert", self.clipboard_get()))
+        self.menu.add_command(label="Copy", command=lambda: self.clipboard_append(self.linkEntry.get()))
+        self.menu.add_command(label="Cut", command=lambda: (self.clipboard_clear(), self.clipboard_append(self.linkEntry.get()), self.linkEntry.delete(0, "end")))
+
+        self.linkEntry.bind("<Button-3>",self.show_menu) # make it appears when the user hit the right lick button on the entry field
+        
         # start download button
         self.download_button = ctk.CTkButton(self,
                                              text="Download",
@@ -56,6 +74,10 @@ class App(ctk.CTk):
         # create a variable to hold error text
         self.error_text = None
 
+    def show_menu(self, event):
+        self.menu.tk_popup(event.x_root, event.y_root)
+        self.menu.grab_release()
+    
     def check_excistance(self):
         # remove previous error text if exists
         if(self.error_text):
@@ -222,12 +244,17 @@ class App(ctk.CTk):
                                                font=("Arial", 14),
                                                command=self.choose_location)
         self.choose_location_button.place(x=410, y=231)
-
+        '''
         # Choose Quality drop box
         opt = video_obj.get_Qualities() # get the resolutions list
-        opt_box = ctk.CTkComboBox(window, values=opt, height=30, width=150, command=self.choose_quality)
-        opt_box.place(x=20, y=310)
-        opt_box.set(opt[-1]) # set the heighst quality as default
+        self.opt_box = ctk.CTkComboBox(window, 
+                                       values=opt, 
+                                       height=30, 
+                                       width=150, 
+                                       command=lambda selected_value: self.choose_quality(video_obj, selected_value))
+        self.opt_box.place(x=20, y=310)
+        self.opt_box.set(opt[-1]) # set the heighst quality as default
+        '''
 
         # Download button
         self.start_download_button = ctk.CTkButton(window,
@@ -246,9 +273,12 @@ class App(ctk.CTk):
             # set the download locatoin variable
             self.download_location = folder_selected
             self.location_label.configure(text=self.download_location)
-
-    def choose_quality(slef, choise):
-        print(choise) # a temp printing
+    
+    """
+    def choose_quality(self, choise, video_obj):
+        choise = self.opt_box.get()
+        print(choise)
+    """
 
     def DownloadVideo(self, video_obj):
         # if the download button exists, destroy it
@@ -299,6 +329,7 @@ class App(ctk.CTk):
                                      corner_radius=0, 
                                      text="",
                                      fg_color="#1F6AA5",
+                                     hover_color="#1F466D",
                                      image=self.pause_icon, 
                                      command=lambda:self.Pause_process(new_downloader))
         self.pause_button.place(relx=0.5, y=340, anchor="center")
@@ -323,10 +354,10 @@ class App(ctk.CTk):
 
         if is_paused:
             is_paused = False
-            self.pause_button.configure(image=self.pause_icon, fg_color="#1F6AA5")
+            self.pause_button.configure(image=self.pause_icon, fg_color="#1F6AA5", hover_color="#1F466D")
         else:
             is_paused = True
-            self.pause_button.configure(image=self.continue_icon, fg_color="orange")
+            self.pause_button.configure(image=self.continue_icon, fg_color="orange", hover_color = "#CD7F32")
 
         downloader_obj.is_paused = is_paused
 

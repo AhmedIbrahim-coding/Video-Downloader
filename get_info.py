@@ -12,7 +12,7 @@ class video:
         self.height = None
         self.width = None
         self.total_size_bytes = None
-        self.formats = []
+        '''self.formats = []'''
 
     def getInformations(self):
         options = {
@@ -104,7 +104,8 @@ class video:
                 else:
                     GB = MB / 1024
                     return f"{GB:.2f} GB"
-                
+    
+    '''            
     def get_Qualities(self):
         formats = self.info.get("formats")
         qualitites = []
@@ -113,4 +114,5 @@ class video:
                 self.formats.append(f)
                 resolution = f.get("resolution")
                 qualitites.append(resolution)
-        return qualitites
+        print(self.formats)
+        return qualitites'''
